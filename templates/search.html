@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <title>CineMate - search</title>
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="icon" href="https://cdn3.iconfinder.com/data/icons/letters-and-numbers-1/32/letter_C_blue-512.png" type="image/x-icon">
+    <style>
+    main {
+        text-align: center;
+        margin-top: 50px;
+    }
+    #title {
+        padding: 5px;
+        margin-bottom: 10px;
+    }
+    button {
+        background: #5E5DF0;
+        border-radius: 999px;
+        box-sizing: border-box;
+        color: #FFFFFF;
+        cursor: pointer;
+        font-family: "Helvetica", sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 24px;
+        opacity: 1;
+        outline: 0 solid transparent;
+        padding: 8px 18px;
+        user-select: none;
+        -webkit-user-select: none;
+        width: fit-content;
+        word-break: break-word;
+        border: 0;
+        margin-bottom: 20px;
+    }
+    .info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .poster {
+        width: 300px;
+        height: auto;
+        margin-right: 20px;
+    }
+    #movie-title {
+        margin: 0;
+    }
+    .rating {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+    .rating img {
+        width: 50px;
+    }
+    .details {
+        margin-bottom: 10px;
+    }
+    .genre {
+        margin-bottom: 20px;
+    }
+    h3 {
+        margin-bottom: 10px;
+    }
+    #response > div {
+        margin-bottom: 20px;
+    }
+    #like-movie-button {
+        background-color: green;
+        margin-right: 10px;
+    }
+    </style>
+</head>
+
+<body>
+    <div id="flash-message"></div>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a style="text-decoration: none; color: white;" href="{{ url_for('search') }}">CineMate</a>
+        </div>
+        <div class="navbar-center">
+            <ul>
+                <li><a href="{{ url_for('search') }}">Search</a></li>
+                <li><a href="{{ url_for('liked') }}">Liked</a></li>
+            </ul>
+        </div>
+        <div class="navbar-right">
+            <div class="dropdown">
+                <button class="dropbtn">Account</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('profile') }}">Profile</a>
+                    <a>
+                        <form action="/logout" method="post">
+                            <input type="submit" value="Logout" id="logout_button">
+                        </form>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main>
+        <input type="text" id="title" placeholder="Movie name here">
+        <button class="liked-movie-button" type="button" onclick="get_movie_info()">Find movie!</button>
+        <button type="button" onclick="get_random_movie()">I'm feeling lucky</button>
+        <div id="response">
+            <div id="success">
+            </div>
+            <div id="empty">
+            </div>
+            <div id="not_found">
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
+
+<script>
+    function get_movie_info() {
+        // get value inputed by user
+        title = document.getElementById("title").value;
+        // get document elements
+        results_element = document.getElementById("result");
+        success_element = document.getElementById("success");
+        empty_element = document.getElementById("empty");
+        not_found_element = document.getElementById("not_found");
+        $.ajax({
+            url: "/get_movie_info",
+            data: {
+                title: title
+            },
+            success: function (result) {
+                if (result == "not found") {
+                    // hide empty and success blocks
+                    empty_element.style.display = "none";
+                    success_element.style.display = "none";
+
+                    // display not_found element
+                    not_found_element.style.display = "block";
+
+                    // display movie not found message
+                    not_found_element.innerHTML = "Movie not found!"
+                }
+                else if (result == "empty") {
+                    // hide not_found and success elements
+                    not_found_element.style.display = "none";
+                    success_element.style.display = "none";
+
+                    // display empty element
+                    empty_element.style.display = "block";
+
+                    // display input message
+                    empty_element.innerHTML = "Please input a movie name"
+                }
+                else {
+                    // hide not_found and empty elements
+                    empty_element.style.display = "none";
+                    not_found_element.style.display = "none";
+                    // display success element
+                    success_element.style.display = "block";
+                    // write to document
+                    success.innerHTML = `
+                        <div class="info">
+                            <button id="like-movie-button" onclick="like_movie('${result.id}')">Like this movie</button>
+                            <img src=${result.image} class="poster" id="image">
+                            <div>
+                                <h2 id="movie-title">${result.title}</h2>
+                                <div class="rating">
+                                    <img src="static/images/star.svg" width="50">
+                                    <h4 id="imdb">${result.imdb}</h4>
+                                </div>
+                                <div class="details">
+                                    <span id="year">${result.year}</span>
+                                    <span id="runtime">${result.runtime}</span>
+                                </div>
+                                <div class="genre">
+                                    <div id="genre">${result.genre}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <h3>Overview:</h3>
+                        <p id="overview">${result.overview}</p>
+                        <h3>Cast:</h3>
+                        <p id="actors">${result.actors}</p>
+                        <h3>Director:</h3>
+                        <p id="director">${result.director}</p>
+                    `;
+                }
+            }
+        });
+    }
+
+    function like_movie(movie_id) {
+        const title = document.getElementById("movie-title").textContent;
+        const image = document.getElementById("image").src;
+        const year = document.getElementById("year").textContent;
+        const imdb = document.getElementById("imdb").textContent;
+        const runtime = document.getElementById("runtime").textContent;
+        const director = document.getElementById("director").textContent;
+        const genre = document.getElementById("genre").textContent;
+        const actors = document.getElementById("actors").textContent;
+        const overview = document.getElementById("overview").textContent;
+
+        $.ajax({
+            url: "/like_movie",
+            data: {
+                movie_id: movie_id,
+                title: title,
+                image: image,
+                year: year,
+                imdb: imdb,
+                runtime: runtime,
+                director: director,
+                genre: genre,
+                actors: actors,
+                overview: overview
+            },
+            success: function (result) {
+                if (result == "ok") {
+                    // show success message
+                    flashMessage = document.getElementById('flash-message');
+                    flashMessage.style.backgroundColor = "#B0FDB0";
+                    flashMessage.style.color = "#0F0";
+                    flashMessage.innerHTML = "Movie liked!"
+
+                    flashMessage.style.display = 'block';
+
+                    if (typeof timer !== 'undefined') {
+                        clearTimeout(timer);
+                    }
+                    timer = setTimeout(() => {
+                        flashMessage.style.display = 'none';
+                    }, 10000);
+                }
+                else if (result == "already") {
+                    // show error message
+                    flashMessage = document.getElementById('flash-message');
+                    flashMessage.style.backgroundColor = "#FD8080";
+                    flashMessage.style.color = "#F00";
+                    flashMessage.textContent = "Movie is already in liked list!"
+
+                    flashMessage.style.display = 'block';
+
+                    if (typeof timer !== 'undefined') {
+                        clearTimeout(timer);
+                    }
+                    timer = setTimeout(() => {
+                        flashMessage.style.display = 'none';
+                    }, 10000);
+                }
+                else {
+                    console.log("error")
+                }
+            }
+        });
+    }
+
+    function get_random_movie() {
+        // get document elements
+        results_element = document.getElementById("result");
+        success_element = document.getElementById("success");
+        empty_element = document.getElementById("empty");
+        not_found_element = document.getElementById("not_found");
+
+        $.ajax({
+            url: "/get_random_movie",
+            success: function (result) {
+                // hide not_found and empty elements
+                empty_element.style.display = "none";
+                empty_element.style.display = "none";
+
+                // display success element
+                success_element.style.display = "block";
+
+                // write to document
+                success.innerHTML = `
+                    <div class="info">
+                        <button id="like-movie-button" onclick="like_movie('${result.id}')">Like this movie</button>
+                        <img src=${result.image} class="poster" id="image">
+                        <div>
+                            <h2 id="movie-title">${result.title}</h2>
+                            <div class="rating">
+                                <img src="static/images/star.svg" width="50">
+                                <h4 id="imdb">${result.imdb}</h4>
+                            </div>
+                            <div class="details">
+                                <span id="year">${result.year}</span>
+                                <span id="runtime">${result.runtime}</span>
+                            </div>
+                            <div class="genre">
+                                <div id="genre">${result.genre}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3>Overview:</h3>
+                    <p id="overview">${result.overview}</p>
+                    <h3>Cast:</h3>
+                    <p id="actors">${result.actors}</p>
+                    <h3>Director:</h3>
+                    <p id="director">${result.director}</p>
+                `;
+            }
+        });
+    }
+</script>

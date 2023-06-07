@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+        <title>CineMate - Login</title>
+        <link rel="stylesheet" href="static/style.css">
+        <style>
+            body {margin: 8px}
+            #login {
+                background: #5E5DF0;
+                border-radius: 999px;
+                box-sizing: border-box;
+                color: #FFFFFF;
+                cursor: pointer;
+                font-family: "Helvetica", sans-serif;
+                font-size: 16px;
+                font-weight: 700;
+                line-height: 24px;
+                opacity: 1;
+                outline: 0 solid transparent;
+                padding: 8px 18px;
+                user-select: none;
+                -webkit-user-select: none;
+                width: fit-content;
+                word-break: break-word;
+                border: 0;
+                margin-bottom: 20px;
+                display: block;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Login to CineMate</h1>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <form action="/login_set" method="post">
+            <p>
+                Username: <input type="text" name="username">
+            </p>
+            <p>
+                Password: <input type="password" name="password">
+            </p>
+            <p>
+                <input id="login" type="submit" value="Login">
+            </p>
+        
+        </form>
+
+        <p><a href="{{ url_for('register') }}">Don't have an account yet?</a></p>
+
+
+
+    </body>
+</html>

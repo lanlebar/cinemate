@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <title>CineMate - register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .bold {
+            font-weight: bold;
+        }
+        #message {
+            display: none;
+            position: relative;
+        }
+        .valid {
+            color: green;
+        }
+        .valid:before {
+            position: relative;
+            content: "✔ ";
+        }
+        .invalid {
+            color: red;
+        }
+        .invalid:before {
+            position: relative;
+            content: "✖ ";
+        }
+        #register {
+                background: #5E5DF0;
+                border-radius: 999px;
+                box-sizing: border-box;
+                color: #FFFFFF;
+                cursor: pointer;
+                font-family: "Helvetica", sans-serif;
+                font-size: 16px;
+                font-weight: 700;
+                line-height: 24px;
+                opacity: 1;
+                outline: 0 solid transparent;
+                padding: 8px 18px;
+                user-select: none;
+                -webkit-user-select: none;
+                width: fit-content;
+                word-break: break-word;
+                border: 0;
+                margin-bottom: 20px;
+                display: block;
+            }
+    </style>
+</head>
+
+<body>
+    <h1>Register to CineMate</h1>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <form action="/register_set" method="post">
+        <p>
+            Name: <input type="text" name="name">
+        </p>
+        <p>
+            Username: <input type="text" name="username" id="username">
+        </p>
+        <p>
+            Password: <input type="password" name="password" id="password">
+        </p>
+        <p>
+            <input id="register" type="submit" value="Register" onclick="">
+        </p>
+    </form>
+
+    <div id="message">
+        <p class="bold">Password must contain the following:</p>
+        <p id="letter" class="invalid">A lowercase letter</p>
+        <p id="capital" class="invalid">A capital letter</p>
+        <p id="number" class="invalid">A number</p>
+        <p id="length" class="invalid">Minimum 8 characters</p>
+    </div>
+
+    <p><a href="{{ url_for('login') }}">Already have an account?</a></p>
+
+    <script>
+        // check password
+        my_input = document.getElementById("password");
+        letter = document.getElementById("letter");
+        capital = document.getElementById("capital");
+        number = document.getElementById("number");
+        length = document.getElementById("length");
+
+        // When the user clicks on the password field, show the message box
+        my_input.onfocus = function () {
+            document.getElementById("message").style.display = "block";
+        }
+
+        // When the user clicks outside of the password field, hide the message box
+        my_input.onblur = function () {
+            document.getElementById("message").style.display = "none";
+        }
+
+        // When the user starts to type something inside the password field
+        my_input.onkeyup = function () {
+            // Validate lowercase letters
+            lower_case_letters = /[a-z]/g;
+            if (my_input.value.match(lower_case_letters)) {
+                letter.classList.remove("invalid");
+                letter.classList.add("valid");
+            } else {
+                letter.classList.remove("valid");
+                letter.classList.add("invalid");
+            }
+
+            // Validate capital letters
+            upper_case_letters = /[A-Z]/g;
+            if (my_input.value.match(upper_case_letters)) {
+                capital.classList.remove("invalid");
+                capital.classList.add("valid");
+            } else {
+                capital.classList.remove("valid");
+                capital.classList.add("invalid");
+            }
+
+            // Validate numbers
+            numbers = /[0-9]/g;
+            if (my_input.value.match(numbers)) {
+                number.classList.remove("invalid");
+                number.classList.add("valid");
+            } else {
+                number.classList.remove("valid");
+                number.classList.add("invalid");
+            }
+
+            // Validate length
+            if (my_input.value.length >= 8) {
+                length.classList.remove("invalid");
+                length.classList.add("valid");
+            } else {
+                length.classList.remove("valid");
+                length.classList.add("invalid");
+            }
+        }
+    </script>
+
+</body>
+
+</html>

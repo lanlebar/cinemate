@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <title>CineMate - {{ name }}</title>
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="icon" href="https://cdn3.iconfinder.com/data/icons/letters-and-numbers-1/32/letter_C_blue-512.png" type="image/x-icon">
+    <script>
+        function validate_name_form() {
+            var old_name = document.getElementById("name_old_name").value;
+            var new_name = document.getElementById("name_new_name").value;
+            var password = document.getElementById("name_password").value;
+            var password_confirm = document.getElementById("name_password_confirm").value;
+
+            if (old_name == new_name) {
+                alert("New name cannot be the same as old name!");
+                return false
+            }
+            if (password != password_confirm) {
+                alert("Passwords do not match!");
+                return false;
+            }
+            return true;
+        }
+
+        function validate_username_form() {
+            var old_username = document.getElementById("username_old_username").value;
+            var new_username = document.getElementById("username_new_username").value;
+            var password = document.getElementById("username_password").value;
+            var password_confirm = document.getElementById("username_password_confirm").value;
+
+            if (old_username == new_username) {
+                alert("New username cannot be the same as old username!");
+                return false
+            }
+
+            if (password != password_confirm) {
+                alert("Passwords do not match!");
+                return false;
+            }
+            return true;
+        }
+
+        function validate_password_form() {
+            var old_password = document.getElementById("password_old_password").value;
+            var password = document.getElementById("password_new_password").value;
+            var password_confirm = document.getElementById("password_new_password_confirm").value;
+            if (password != password_confirm) {
+                alert("New passwords do not match!");
+                return false;
+            }
+            if (old_password == password_confirm) {
+                alert("New password cannot be the same as old password!")
+                return false
+            }
+            return true;
+        }
+
+        function validate_deletion_form() {
+            var password = document.getElementById("delete_password").value;
+            var password_confirm = document.getElementById("delete_password_confirm").value;
+            if (password != password_confirm) {
+                alert("Passwords do not match!");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+
+<body>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a style="text-decoration: none; color: white;" href="{{ url_for('search') }}">CineMate</a>
+        </div>
+        <div class="navbar-center">
+            <ul>
+                <li><a href="{{ url_for('search') }}">Search</a></li>
+                <li><a href="{{ url_for('liked') }}">Liked</a></li>
+            </ul>
+        </div>
+        <div class="navbar-right">
+            <div class="dropdown">
+                <button class="dropbtn">Account</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('profile') }}">Profile</a>
+                    <a>
+                        <form action="/logout" method="post">
+                            <input type="submit" value="Logout" id="logout_button">
+                        </form>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main>
+        <p id="user-greet">Hello, {{ name }}!</p>
+
+        <button class="button-profile" onclick="document.getElementById('change_name_modal').style.display='block'">Change Name</button>
+        <div id="change_name_modal" class="modal">
+            <div class="modal_content">
+                <span class="close"
+                    onclick="document.getElementById('change_name_modal').style.display='none'">&times;</span>
+                <h2>Change Name</h2>
+                <form onsubmit="return validate_name_form()" action="/change_name" method="post">
+                    <label for="name_old_name">Old Name:</label>
+                    <input type="text" id="name_old_name" name="name_old_name" required><br><br>
+
+                    <label for="name_new_name">New Name:</label>
+                    <input type="text" id="name_new_name" name="name_new_name" required><br><br>
+
+                    <label for="name_password">Password:</label>
+                    <input type="password" id="name_password" name="name_password" required><br><br>
+
+                    <label for="name_password_confirm">Confirm Password:</label>
+                    <input type="password" id="name_password_confirm" name="name_password_confirm" required><br><br>
+                    <input type="submit" value="Change name">
+                </form>
+            </div>
+        </div>
+        <button class="button-profile" onclick="document.getElementById('change_username_modal').style.display='block'">Change Username</button>
+        <div id="change_username_modal" class="modal">
+            <div class="modal_content">
+                <span class="close"
+                    onclick="document.getElementById('change_username_modal').style.display='none'">&times;</span>
+                <h2>Change Username</h2>
+                <form onsubmit="return validate_username_form()" action="/change_username" method="post">
+                    <label for="username_old_username">Old Username:</label>
+                    <input type="text" id="username_old_username" name="username_old_username" required><br><br>
+
+                    <label for="username_new_username">New Username:</label>
+                    <input type="text" id="username_new_username" name="username_new_username" required><br><br>
+
+                    <label for="username_password">Password:</label>
+                    <input type="password" id="username_password" name="username_password" required><br><br>
+
+                    <label for="username_password_confirm">Confirm Password:</label>
+                    <input type="password" id="username_password_confirm" name="username_password_confirm"
+                        required><br><br>
+                    <input type="submit" value="Change username">
+                </form>
+            </div>
+        </div>
+        <button class="button-profile" onclick="document.getElementById('change_password_modal').style.display='block'">Change Password</button>
+        <div id="change_password_modal" class="modal">
+            <div class="modal_content">
+                <span class="close"
+                    onclick="document.getElementById('change_password_modal').style.display='none'">&times;</span>
+                <h2>Change Password</h2>
+                <form onsubmit="return validate_password_form()" action="/change_password" method="post">
+                    <label for="password_old_password">Old Password:</label>
+                    <input type="password" id="password_old_password" name="password_old_password" required><br><br>
+
+                    <label for="password_new_password">New Password:</label>
+                    <input type="password" id="password_new_password" name="password_new_password" required><br><br>
+                    <div id="message">
+                        <p class="bold">Password must contain the following:</p>
+                        <p id="letter" class="invalid">A lowercase letter</p>
+                        <p id="capital" class="invalid">A capital letter</p>
+                        <p id="number" class="invalid">A number</p>
+                        <p id="length" class="invalid">Minimum 8 characters</p>
+                    </div>
+
+                    <label for="password_new_password_confirm">Confirm Password:</label>
+                    <input type="password" id="password_new_password_confirm" name="password_new_password_confirm"
+                        required><br><br>
+                    <input type="submit" value="Change password">
+                </form>
+            </div>
+        </div>
+        <button class="button-profile" onclick="document.getElementById('delete_user_modal').style.display='block'">Delete user</button>
+        <div id="delete_user_modal" class="modal">
+            <div class="modal_content">
+                <span class="close"
+                    onclick="document.getElementById('delete_user_modal').style.display='none'">&times;</span>
+                <h2 style="color: red">Delete user</h2>
+                <form onsubmit="return validate_deletion_form()" action="/delete_user" method="post">
+                    <label for="delete_password">Password:</label>
+                    <input type="password" class="password_field" id="delete_password" name="delete_password"
+                        required><br><br>
+
+                    <label for="delete_password_confirm">Confirm Password:</label>
+                    <input type="password" id="delete_password_confirm" name="delete_password_confirm" required><br><br>
+
+                    <input type="checkbox" id="delete_terms" name="delete_terms" required>
+                    <label for="delete_terms">I understand that deleting account is permanent and all data will be
+                        lost.</label><br><br>
+
+                    <input type="submit" value="Delete user">
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
+<script>
+    // check password
+    my_input = document.getElementById("password_new_password");
+    letter = document.getElementById("letter");
+    capital = document.getElementById("capital");
+    number = document.getElementById("number");
+    length = document.getElementById("length");
+
+    my_input.onfocus = function () {
+        document.getElementById("message").style.display = "block";
+    }
+
+    my_input.onblur = function () {
+        document.getElementById("message").style.display = "none";
+    }
+
+    my_input.onkeyup = function () {
+        lower_case_letters = /[a-z]/g;
+        if (my_input.value.match(lower_case_letters)) {
+            letter.classList.remove("invalid");
+            letter.classList.add("valid");
+        } else {
+            letter.classList.remove("valid");
+            letter.classList.add("invalid");
+        }
+        upper_case_letters = /[A-Z]/g;
+        if (my_input.value.match(upper_case_letters)) {
+            capital.classList.remove("invalid");
+            capital.classList.add("valid");
+        } else {
+            capital.classList.remove("valid");
+            capital.classList.add("invalid");
+        }
+        numbers = /[0-9]/g;
+        if (my_input.value.match(numbers)) {
+            number.classList.remove("invalid");
+            number.classList.add("valid");
+        } else {
+            number.classList.remove("valid");
+            number.classList.add("invalid");
+        }
+        if (my_input.value.length >= 8) {
+            length.classList.remove("invalid");
+            length.classList.add("valid");
+        } else {
+            length.classList.remove("valid");
+            length.classList.add("invalid");
+        }
+    }
+
+</script>

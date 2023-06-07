@@ -1,0 +1,40 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMate - 404 Not Found</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+    crossorigin=""></script>
+</head>
+<body>
+    <h1>404 - File not found :(</h1>
+    <p>Anyway, heres a cool map</p>
+    <div style="height: 400px;" id="map"></div>
+</body>
+</html>
+<script>
+    var latitude ;
+    var longitude;
+    // Initialize the map
+    var map = L.map('map', {attributionControl: false}).setView([0, 0], 13);
+
+    // Add the tile layer (you can use any tile provider)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map);
+
+    // Get the user's location and display it on the map
+    map.locate({ setView: true, maxZoom: 16 });
+    function onLocationFound(e) {
+        L.marker(e.latlng).addTo(map);
+    }
+    map.on('locationfound', onLocationFound);
+    function onLocationError(e) {
+        alert(e.message);
+    }
+    map.on('locationerror', onLocationError);
+
+</script>

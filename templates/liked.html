@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <title>CineMate</title>
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="icon" href="https://cdn3.iconfinder.com/data/icons/letters-and-numbers-1/32/letter_C_blue-512.png" type="image/x-icon">
+    <style>
+    button {
+        background: #5E5DF0;
+        border-radius: 999px;
+        box-sizing: border-box;
+        color: #FFFFFF;
+        cursor: pointer;
+        font-family: "Helvetica", sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 24px;
+        opacity: 1;
+        outline: 0 solid transparent;
+        padding: 8px 18px;
+        user-select: none;
+        -webkit-user-select: none;
+        width: fit-content;
+        word-break: break-word;
+        border: 0;
+        margin-bottom: 20px;
+    }
+    #sort-by {
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 16px;
+        color: #333;
+        background-color: #fff;
+    }
+    #search-input {
+        padding: 5px;
+    }
+    </style>
+</head>
+<body>
+    <div id="flash-message"></div>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a style="text-decoration: none; color: white;" href="{{ url_for('search') }}">CineMate</a>
+        </div>
+        <div class="navbar-center">
+            <ul>
+                <li><a href="{{ url_for('search') }}">Search</a></li>
+                <li><a href="{{ url_for('liked') }}">Liked</a></li>
+            </ul>
+        </div>
+        <div class="navbar-right">
+            <div class="dropdown">
+                <button class="dropbtn">Account</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('profile') }}">Profile</a>
+                    <a>
+                        <form action="/logout" method="post">
+                            <input type="submit" value="Logout" id="logout_button">
+                        </form>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main>
+        <label for="search-input"> Search liked movies: </label>
+        <input type="text" name="search-input" id="search-input">
+        <button onclick="search(document.getElementById('search-input').value)">Search</button>
+    
+        <select id="sort-by" onchange="get_liked_movies()">
+            <option value="title">Title</option>
+            <option value="imdb">IMDB Rating</option>
+            <option value="year">Year</option>
+        </select>
+        <button id="sort-order-btn" onclick="toggle_sort_order()">Ascending</button>
+        <div id="no-liked">
+    
+        </div>
+        <div id="movies-container"></div>
+    </main>
+</body>
+</html>
+<script>
+    let sort_order = 'asc';
+    const sort_order_btn = document.getElementById('sort-order-btn');
+
+    function toggle_sort_order() {
+        sort_order = sort_order === 'asc' ? 'desc' : 'asc';
+        sort_order_btn.innerHTML = sort_order === 'asc' ? 'Ascending' : 'Descending';
+        sort_order_btn.classList.toggle('descending');
+        get_liked_movies();
+    }
+
+    function sort_movies(movies, sort_key, sort_order = 'asc') {
+        const sort_multiplier = sort_order === 'desc' ? -1 : 1;
+        return movies.sort((a, b) => {
+            if (a[sort_key] < b[sort_key]) {
+                return -1 * sort_multiplier;
+            }
+            if (a[sort_key] > b[sort_key]) {
+                return 1 * sort_multiplier;
+            }
+            return 0;
+        });
+    }
+    window.onload = get_liked_movies;
+    function get_liked_movies() {
+        $.ajax({
+            url: "/get_liked_movies",
+            success: function (result) {
+                no_liked_element = document.getElementById("no-liked");
+                movies_containter = document.getElementById("movies-container");
+
+                if (result == "no liked") {
+                    // hide movies_containter
+                    movies_containter.style.display = "none";
+                    // display no-liked
+                    no_liked_element.style.display = "block";
+                    no_liked_element.innerHTML = "No liked movies!";
+                }
+                else {
+                    // hide no_liked
+                    no_liked_element.style.display = "none";
+                    // display movies_containter
+                    movies_containter.style.display = "block";
+                    // Sort movies
+                    sortedMovies = sort_movies(result, document.getElementById('sort-by').value, sort_order);
+                    // Set the HTML of the movie list element to the generated HTML string
+                    movies_containter.innerHTML = sortedMovies.map(movie => {
+                        return `
+                        <div class="movie">
+                            <img src="${movie.image}" alt="${movie.title}">
+                            <h3>
+                                ${movie.title} (${movie.year})
+                                <button style="background-color: red; box-shadow: none;" onclick="dislike_movie('${movie.id}')">Dislike movie</button>
+                            </h3>
+                            <p>${movie.imdb}</p>
+                            <p>${movie.runtime}</p>
+                            <p>${movie.director}</p>
+                            <p>${movie.genre}</p>
+                            <p>${movie.actors}</p>
+                            <p>${movie.overview}</p>
+                        </div>
+                        <hr>
+                    `;
+                    }).join('');
+                }
+            }
+        });
+    }
+
+    function dislike_movie(movie_id) {
+        $.ajax({
+            url: "/dislike_movie",
+            data: {
+                movie_id: movie_id
+            },
+            success: function (result) {
+                if (result == "ok") {
+                    // display message successfully unliked
+                    flashMessage = document.getElementById('flash-message');
+                    flashMessage.style.backgroundColor = "#B0FDB0";
+                    flashMessage.style.color = "#0F0";
+                    flashMessage.innerHTML = "Movie disliked!"
+
+                    flashMessage.style.display = 'block';
+
+                    if (typeof timer !== 'undefined') {
+                        clearTimeout(timer);
+                    }
+                    timer = setTimeout(() => {
+                        flashMessage.style.display = 'none';
+                    }, 10000);
+                    // reload all movies
+                    get_liked_movies()
+                }
+            }
+        });
+    }
+
+    function search(title) {
+        if (title === "") {
+            get_liked_movies()
+        }
+        else {
+            $.ajax({
+                url: "/search_movie",
+                data: {
+                    title: title
+                },
+                success: function (result) {
+                    no_liked_element = document.getElementById("no-liked");
+                    movies_containter = document.getElementById("movies-container");
+                    if (result == "none") {
+                        // hide movies_containter
+                        movies_containter.style.display = "none";
+
+                        // display no-liked
+                        no_liked_element.style.display = "block";
+                        no_liked_element.innerHTML = "No movies found!";
+                    }
+                    else {
+                        // hide no_liked
+                        no_liked_element.style.display = "none";
+
+                        // display movies_containter
+                        movies_containter.style.display = "block";
+
+                        // Iterate over each movie object and create a HTML string to display it
+                        movieListHtml = result.map(movie => {
+                            return `
+                            <div class="movie">
+                                <img src="${movie.image}" alt="${movie.title}">
+                                <h3>
+                                    ${movie.title} (${movie.year})
+                                    <button style="background-color: red; box-shadow: none;" onclick="dislike_movie()">Dislike movie</button>
+                                </h3>
+                                <p>${movie.imdb}</p>
+                                <p>${movie.runtime}</p>
+                                <p>${movie.director}</p>
+                                <p>${movie.genre}</p>
+                                <p>${movie.actors}</p>
+                                <p>${movie.overview}</p>
+                            </div>
+                            <hr>
+                        `;
+                        }).join('');
+
+                        // Set the HTML of the movie list element to the generated HTML string
+                        movies_containter.innerHTML = movieListHtml;
+                    }
+                }
+            });
+        }
+    }
+</script>
