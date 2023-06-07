@@ -1,7 +1,7 @@
 # Cinemate
-Cinemate is a web-based application that allows users to search for movies and TV shows and add them to their liked list. Users can also explore movies with the "I'm feeling lucky" functionality. App requires user to make an account in order to use the app - user auth and database managment in the background \
+Cinemate is a web-based application that allows users to search for movies and TV shows and add them to their liked list. Users can also explore movies with the "I'm feeling lucky" functionality. App requires user to make an account in order to use the app - user auth and database managment in the background. \
 \
-I made Cinemate for a final project for my programming in class. I didn't really have any intension of publishing it, its more like a dummy project
+I created Cinemate as part of my programming class's final project. It was primarily designed as a dummy project and wasn't intended for publication or real-world use.
 
 ## Features
 - Movies and TV shows search - the search functionality utilizes the OMDB API to retrieve movie information based on user queries.
@@ -21,5 +21,5 @@ I made Cinemate for a final project for my programming in class. I didn't really
 ## Installation
 - git clone *https://github.com/lanlebar/cinemate.git*
 - cd cinemate
-- Run main.py file (dependencies install themselves) 
+- python main.py (run the main.py file)
 - Web-app is running on 127.0.0.1:8080 (usually)
