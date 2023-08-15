@@ -10,10 +10,10 @@ I created Cinemate as part of my programming class's final project. It was prima
 - User auth - each user has to be register in order to use the app - TinyDB used for database functionality. When registered, user gets its own table, where liked movies are stored
 
 ## Tech stack
-- **Python Flask** -  I'm really comfortable in Python so I didn't think twice before choosing my backend language.
-- **TinyDB** - used for user managment. Tbh, I was too lazy to integrate a real RDBMS to this dummy project :)
-- **Ajax** - asynchronous stuff
-- **HTML, CSS, JS**: nothing special for the front-end. UI/UX wasn't really my priority with this project, this explains the not so preety visuals of it
+- **Python Flask**
+- **TinyDB** - was to lazy to impliment actual RDBMS
+- **Ajax**
+- **HTML, CSS, JS** - nothing special for the front-end. UI/UX wasn't really my priority with this project, this explains the not so preety visuals of it
 - **APIs and other tools**
   - OMDB API - to get movie information from users search queriers
   - TMDB API - used to enable the 'I'm feeling lucky' - gets a random movie
@@ -22,4 +22,4 @@ I created Cinemate as part of my programming class's final project. It was prima
 - git clone *https://github.com/lanlebar/cinemate.git*
 - cd cinemate
 - python main.py (run the main.py file)
-- Web-app is running on 127.0.0.1:8080 (usually)
+- app is running on 127.0.0.1:8080 (usually)
